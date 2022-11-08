@@ -10,6 +10,7 @@ const initialState = {
   userError: null,
   loginStatus: "idle",
   registerStatus: "idle",
+  removeStatus: "idle",
 };
 
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
@@ -24,6 +25,12 @@ export const fetchUserById = createAsyncThunk(
     return response.data;
   }
 );
+
+export const removeUser = createAsyncThunk("users/removeUser", async (id) => {
+  const response = await client.delete(`/users/${id}`);
+  return response.data;
+});
+
 export const userLogin = createAsyncThunk("users/userLogin", async (email) => {
   const response = await client.get(`/users/search?q=${email}`);
   return response.data;
@@ -59,7 +66,6 @@ export const usersSlice = createSlice({
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
       state.usersStatus = "succeeded";
       // Add any fetched users to the array
-      console.log("fetchUsers", action.payload.users);
       state.users = action.payload.users;
     });
     builder.addCase(fetchUsers.rejected, (state, action) => {
@@ -101,6 +107,17 @@ export const usersSlice = createSlice({
     builder.addCase(userRegister.rejected, (state, action) => {
       state.registerStatus = "failed";
       state.registerError = action.error.message;
+    });
+    builder.addCase(removeUser.pending, (state, action) => {
+      state.removeStatus = "loading";
+    });
+    builder.addCase(removeUser.fulfilled, (state, action) => {
+      state.removeStatus = "succeeded";
+      window.location.href = "/users";
+    });
+    builder.addCase(removeUser.rejected, (state, action) => {
+      state.removeStatus = "failed";
+      state.removeError = action.error.message;
     });
   },
 });

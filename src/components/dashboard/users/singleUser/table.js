@@ -3,9 +3,20 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { Button } from "@mui/material";
+import { Button, Stack } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { removeUser } from "../../../auth/usersSlice";
 
 export default function SingleUserTable({ user, setIsTable, isTable }) {
+  const removeStatus = useSelector((state) => state.users.removeStatus);
+  const dispatch = useDispatch();
+
+  const onRemoveClick = () => {
+    if (removeStatus === "idle") {
+      dispatch(removeUser(user?.id));
+    }
+  };
+
   return (
     <>
       <Table size='large'>
@@ -44,13 +55,22 @@ export default function SingleUserTable({ user, setIsTable, isTable }) {
           </TableRow>
         </TableBody>
       </Table>
-      <Button
-        onClick={() => setIsTable(!isTable)}
-        variant='contained'
-        sx={{ mb: 5 }}
+      <Stack
+        sx={{
+          mt: 5,
+          mb: 5,
+          alignSelf: "center",
+        }}
+        spacing={2}
+        direction='row'
       >
-        Edit user
-      </Button>
+        <Button onClick={() => setIsTable(!isTable)} variant='contained'>
+          Edit user
+        </Button>
+        <Button onClick={() => onRemoveClick()} variant='contained'>
+          Remove user
+        </Button>
+      </Stack>
     </>
   );
 }
